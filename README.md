@@ -1,6 +1,6 @@
 # Miralvento CRM — Ficha de contactos
 
-Reto técnico de Kontaktu: la ficha de detalle de un contacto de CRM inmobiliario, construida sobre un dataset deliberadamente sucio (cuatro formatos de teléfono, fechas en tres formatos distintos, cualificación con forma variable, un caso de `qualification_data` como string JSON, etc.).
+La ficha de detalle de un contacto de CRM inmobiliario, construida sobre un dataset deliberadamente sucio (cuatro formatos de teléfono, fechas en tres formatos distintos, cualificación con forma variable, un caso de `qualification_data` como string JSON, etc.).
 
 ## Cómo correrlo
 
