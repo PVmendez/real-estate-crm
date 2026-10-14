@@ -5,11 +5,13 @@ import { ArrowLeft } from "lucide-react";
 import { getContact, getContacts } from "@/lib/contacts-repo";
 import { computeConsent, computeHealth, findDuplicates } from "@/lib/derive";
 import { resolveDisplayName } from "@/lib/normalize";
+import { buildNormalizationReport } from "@/lib/report";
 import { ContactAlerts } from "@/components/contact/ContactAlerts";
 import { DataQuality } from "@/components/contact/DataQuality";
 import { IdentityHeader } from "@/components/contact/IdentityHeader";
 import { NotesSection } from "@/components/contact/NotesSection";
 import { QualificationSection } from "@/components/contact/QualificationSection";
+import { RawVsNormalized } from "@/components/contact/RawVsNormalized";
 import { Timeline } from "@/components/contact/Timeline";
 
 type Props = { params: Promise<{ id: string }> };
@@ -33,6 +35,7 @@ export default async function ContactDetailPage({ params }: Props) {
       <div className="mt-4 space-y-4">
         <IdentityHeader contact={contact} consent={consent} />
         <ContactAlerts contact={contact} consent={consent} duplicates={findDuplicates(allContacts, contact)} />
+        <RawVsNormalized report={buildNormalizationReport(contact)} />
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">

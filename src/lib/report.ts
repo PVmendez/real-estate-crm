@@ -156,7 +156,7 @@ function leadSourceRow(contact: Contact): NormalizationRow {
 }
 
 const DATE_RULES = {
-  iso: "ISO 8601 con zona horaria",
+  iso: "ISO 8601 en UTC: se muestra en hora de Madrid",
   dmy: "dd/mm/aaaa: día primero (formato español), hora de Madrid",
   "dmy-time": "dd/mm/aaaa HH:mm: día primero, hora de Madrid",
   "epoch-s": "Timestamp Unix en segundos",
