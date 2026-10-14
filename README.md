@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/PVmendez/real-estate-crm/actions/workflows/ci.yml/badge.svg)](https://github.com/PVmendez/real-estate-crm/actions/workflows/ci.yml)
 
-**Demo:** _pendiente de publicar_ — se despliega en Cloudflare Workers con `npm run cf:deploy` (ver [Despliegue](#despliegue)).
+**Demo:** <https://miralvento-crm.nordicdevs.workers.dev> — desplegada en Cloudflare Workers con `npm run cf:deploy` (ver [Despliegue](#despliegue)).
 
 ![Listado de contactos: una búsqueda por «0034 655 12» encuentra a la misma persona registrada dos veces con el teléfono escrito de formas distintas](docs/screenshots/listado.png)
 
