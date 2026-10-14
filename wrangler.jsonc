@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "miralvento-crm",
+  // Worker generado por OpenNext: sirve las páginas, los route handlers (/api/contacts) y los assets.
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-09-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "services": [
+    {
+      // Permite que el Worker se invoque a sí mismo para revalidaciones internas de Next.
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "miralvento-crm"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
-import contactsFile from "@/data/contactos.json";
-import type { Contact } from "@/lib/types";
-import { simulateLatency } from "@/lib/server-utils";
+import { getContact } from "@/lib/contacts-repo";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
-  await simulateLatency();
   const { id } = await params;
-  const contacts = contactsFile.contacts as unknown as Contact[];
-  const contact = contacts.find((c) => c.id === id);
+  const contact = await getContact(id);
 
   if (!contact) {
     return NextResponse.json({ error: "Contacto no encontrado" }, { status: 404 });

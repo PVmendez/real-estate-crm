@@ -1,40 +1,65 @@
-import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import Link from "next/link";
-import { fetchContact, fetchContacts } from "@/lib/api";
+import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import { getContact, getContacts } from "@/lib/contacts-repo";
 import { computeConsent, computeHealth, findDuplicates } from "@/lib/derive";
+import { resolveDisplayName } from "@/lib/normalize";
+import { buildNormalizationReport } from "@/lib/report";
+import { ContactAlerts } from "@/components/contact/ContactAlerts";
+import { DataQuality } from "@/components/contact/DataQuality";
 import { IdentityHeader } from "@/components/contact/IdentityHeader";
-import { HandoffBanner } from "@/components/contact/HandoffBanner";
-import { ComplianceBanner } from "@/components/contact/ComplianceBanner";
-import { DuplicateBanner } from "@/components/contact/DuplicateBanner";
-import { HealthMeter } from "@/components/contact/HealthMeter";
 import { NotesSection } from "@/components/contact/NotesSection";
 import { QualificationSection } from "@/components/contact/QualificationSection";
+import { RawVsNormalized } from "@/components/contact/RawVsNormalized";
 import { Timeline } from "@/components/contact/Timeline";
 
-export default async function ContactDetailPage({ params }: { params: Promise<{ id: string }> }) {
+type Props = { params: Promise<{ id: string }> };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const contact = await getContact((await params).id);
+  return { title: contact ? resolveDisplayName(contact).name : "Contacto no encontrado" };
+}
+
+export default async function ContactDetailPage({ params }: Props) {
   const { id } = await params;
-  const contact = await fetchContact(id);
+  const [contact, allContacts] = await Promise.all([getContact(id), getContacts()]);
   if (!contact) notFound();
 
-  const allContacts = await fetchContacts();
   const consent = computeConsent(contact);
-  const health = computeHealth(contact);
-  const duplicates = findDuplicates(allContacts, contact);
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-4 px-4 py-8 sm:px-6">
-      <Link href="/" className="text-sm text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
-        ← Volver al listado
-      </Link>
+    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
+      <BackLink />
 
-      <IdentityHeader contact={contact} />
-      <HandoffBanner contact={contact} />
-      <ComplianceBanner consent={consent} />
-      <DuplicateBanner matches={duplicates} />
-      <HealthMeter health={health} />
-      <NotesSection notes={contact.notes} />
-      <QualificationSection contact={contact} />
-      <Timeline interactions={contact.interactions} />
+      <div className="mt-4 space-y-4">
+        <IdentityHeader contact={contact} consent={consent} />
+        <ContactAlerts contact={contact} consent={consent} duplicates={findDuplicates(allContacts, contact)} />
+        <RawVsNormalized report={buildNormalizationReport(contact)} />
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
+        <div className="min-w-0 space-y-4">
+          <QualificationSection contact={contact} />
+          <Timeline interactions={contact.interactions} />
+        </div>
+        <aside className="space-y-4" aria-label="Resumen de la ficha">
+          <DataQuality health={computeHealth(contact)} />
+          <NotesSection notes={contact.notes} />
+        </aside>
+      </div>
     </div>
+  );
+}
+
+function BackLink() {
+  return (
+    <Link
+      href="/"
+      className="inline-flex min-h-11 items-center gap-1.5 rounded-sm text-sm font-medium text-ink-muted hover:text-ink"
+    >
+      <ArrowLeft aria-hidden="true" className="size-4" />
+      Contactos
+    </Link>
   );
 }

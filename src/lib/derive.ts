@@ -1,5 +1,5 @@
 import type { Contact } from "./types";
-import { normalizePhone, parseFlexibleDate, resolveDisplayName } from "./normalize";
+import { normalizeEmail, normalizePhone, parseFlexibleDate, resolveDisplayName } from "./normalize";
 import { parseQualificationData } from "./qualification";
 
 export function lastInteractionAt(contact: Contact): Date | null {
@@ -26,7 +26,7 @@ export function computeHealth(contact: Contact): HealthReport {
   const items: HealthCheckItem[] = [
     { label: "Nombre real (no derivado de teléfono/email)", points: 15, ok: !isFallback },
     { label: "Teléfono normalizable", points: 15, ok: normalizePhone(contact.phone) !== null },
-    { label: "Email", points: 10, ok: !!contact.email },
+    { label: "Email válido", points: 10, ok: normalizeEmail(contact.email)?.valid === true },
     { label: "Al menos un dato de cualificación", points: 30, ok: groups.length > 0 },
     { label: "Al menos una interacción registrada", points: 20, ok: contact.interactions.length > 0 },
     { label: "Agente asignado", points: 10, ok: !!contact.assigned_agent_id },
@@ -84,19 +84,20 @@ export interface ConsentStatus {
 const NO_CONTACT_TAG = "no-llamar";
 
 export function computeConsent(contact: Contact): ConsentStatus {
+  const hasValidEmail = normalizeEmail(contact.email)?.valid === true;
   const flagged = (contact.tags ?? []).some((t) => t.toLowerCase() === NO_CONTACT_TAG) || contact.matching_enabled === false;
 
   if (!flagged) {
     const allowed: ContactChannel[] = [];
     if (contact.phone) allowed.push("call", "whatsapp");
-    if (contact.email) allowed.push("email");
+    if (hasValidEmail) allowed.push("email");
     return { blocked: false, allowedChannels: allowed, reason: null };
   }
 
   const emailOnly = /solo.*email|email.*únicamente|unicamente.*email/i.test(contact.notes ?? "");
   return {
     blocked: true,
-    allowedChannels: emailOnly && contact.email ? ["email"] : [],
+    allowedChannels: emailOnly && hasValidEmail ? ["email"] : [],
     reason: contact.notes ?? "Este contacto ha pedido no ser contactado.",
   };
 }
