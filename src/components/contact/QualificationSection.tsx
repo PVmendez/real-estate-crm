@@ -1,13 +1,13 @@
-import { Badge } from "@/components/Badge";
+import { Badge, type Tone } from "@/components/ui/Badge";
 import { formatFactValue, parseQualificationData, provenanceInfo } from "@/lib/qualification";
 import { formatDate } from "@/lib/normalize";
 import type { Contact } from "@/lib/types";
 
-const PROVENANCE_CLASSES: Record<string, string> = {
-  human: "bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300",
-  ai: "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400",
-  import: "bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-500",
-  unknown: "bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500",
+const PROVENANCE_TONES: Record<string, Tone> = {
+  human: "accent",
+  ai: "info",
+  import: "neutral",
+  unknown: "neutral",
 };
 
 export function QualificationSection({ contact }: { contact: Contact }) {
@@ -46,7 +46,7 @@ export function QualificationSection({ contact }: { contact: Contact }) {
                     <dd className="text-right">
                       <p className="font-medium text-zinc-900 dark:text-zinc-50">{formatFactValue(key, fact.value)}</p>
                       <div className="mt-0.5 flex items-center justify-end gap-1.5">
-                        <Badge className={PROVENANCE_CLASSES[provenance.kind]}>{provenance.label}</Badge>
+                        <Badge tone={PROVENANCE_TONES[provenance.kind]}>{provenance.label}</Badge>
                         {fact.updatedAt && <span className="text-[11px] text-zinc-400">{formatDate(fact.updatedAt)}</span>}
                       </div>
                     </dd>

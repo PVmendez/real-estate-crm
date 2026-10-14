@@ -1,5 +1,5 @@
-import { Avatar } from "@/components/Avatar";
-import { Badge } from "@/components/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { ChannelBadge } from "@/components/ui/ChannelBadge";
 import { normalizeChannel, normalizePhone, resolveDisplayName, formatDate } from "@/lib/normalize";
 import { computeConsent } from "@/lib/derive";
 import type { Contact } from "@/lib/types";
@@ -19,7 +19,7 @@ export function IdentityHeader({ contact }: { contact: Contact }) {
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">{identity.name}</h1>
-              <Badge className={channel.colorClass}>{channel.label}</Badge>
+              <ChannelBadge {...channel} />
             </div>
             {identity.isFallback && (
               <p className="mt-0.5 text-xs text-zinc-400">Sin nombre registrado — se muestra el mejor dato disponible</p>

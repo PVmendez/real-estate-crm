@@ -1,4 +1,4 @@
-import { Badge } from "@/components/Badge";
+import { ChannelBadge } from "@/components/ui/ChannelBadge";
 import { normalizeChannel, formatDateTime, parseFlexibleDate } from "@/lib/normalize";
 import type { Interaction } from "@/lib/types";
 import { TranscriptToggle } from "./TranscriptToggle";
@@ -30,7 +30,7 @@ export function Timeline({ interactions }: { interactions: Interaction[] }) {
           return (
             <li key={interaction.id} className="border-l-2 border-zinc-100 pl-4 dark:border-zinc-800">
               <div className="flex flex-wrap items-center gap-2 text-xs">
-                <Badge className={channel.colorClass}>{channel.label}</Badge>
+                <ChannelBadge {...channel} />
                 <span className="text-zinc-400">{interaction.direction === "inbound" ? "recibido" : "enviado"}</span>
                 <span className="text-zinc-400">·</span>
                 <span className="text-zinc-400">{formatDateTime(interaction.created_at)}</span>

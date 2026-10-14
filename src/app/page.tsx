@@ -2,8 +2,9 @@ import Link from "next/link";
 import { getContacts } from "@/lib/contacts-repo";
 import { normalizeChannel, resolveDisplayName, formatDateTime } from "@/lib/normalize";
 import { lastInteractionAt, computeConsent } from "@/lib/derive";
-import { Avatar } from "@/components/Avatar";
-import { Badge } from "@/components/Badge";
+import { Avatar } from "@/components/ui/Avatar";
+import { Badge } from "@/components/ui/Badge";
+import { ChannelBadge } from "@/components/ui/ChannelBadge";
 
 export default async function ContactsListPage() {
   const contacts = await getContacts();
@@ -41,22 +42,20 @@ export default async function ContactsListPage() {
                   <div className="flex items-center gap-2">
                     <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">{identity.name}</p>
                     {contact.is_test && (
-                      <Badge className="bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">test</Badge>
+                      <Badge>test</Badge>
                     )}
                     {consent.blocked && (
-                      <Badge className="bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300">no contactar</Badge>
+                      <Badge tone="danger">no contactar</Badge>
                     )}
                     {contact.ai_handoff && (
-                      <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300">
-                        necesita humano
-                      </Badge>
+                      <Badge tone="warn">necesita humano</Badge>
                     )}
                   </div>
                   <p className="mt-0.5 truncate text-sm text-zinc-500 dark:text-zinc-400">
                     {last ? `Última interacción: ${formatDateTime(last.toISOString())}` : "Sin interacciones registradas"}
                   </p>
                 </div>
-                <Badge className={channel.colorClass}>{channel.label}</Badge>
+                <ChannelBadge {...channel} />
               </Link>
             </li>
           );

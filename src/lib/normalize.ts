@@ -177,29 +177,28 @@ function initialsFrom(name: string): string {
   return (parts[0][0] + parts[1][0]).toUpperCase();
 }
 
+export type ChannelKind = "call" | "whatsapp" | "web" | "ads" | "email" | "import" | "unknown";
+
 export interface ChannelInfo {
   label: string;
-  colorClass: string;
+  kind: ChannelKind;
 }
 
 const CHANNEL_MAP: Record<string, ChannelInfo> = {
-  VOICE_CALL: { label: "Llamada", colorClass: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300" },
-  VOICE: { label: "Llamada", colorClass: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300" },
-  LLAMADA: { label: "Llamada", colorClass: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300" },
-  VOZ: { label: "Llamada", colorClass: "bg-violet-100 text-violet-700 dark:bg-violet-500/15 dark:text-violet-300" },
-  WHATSAPP: { label: "WhatsApp", colorClass: "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300" },
-  WEBSITE: { label: "Web", colorClass: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300" },
-  WEB_FORM: { label: "Formulario web", colorClass: "bg-sky-100 text-sky-700 dark:bg-sky-500/15 dark:text-sky-300" },
-  META_LEAD_ADS: { label: "Meta Ads", colorClass: "bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300" },
-  EMAIL: { label: "Email", colorClass: "bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300" },
-  WITEI: { label: "Importado (Witei)", colorClass: "bg-zinc-200 text-zinc-700 dark:bg-zinc-500/15 dark:text-zinc-300" },
-  CRM: { label: "Importado (CRM)", colorClass: "bg-zinc-200 text-zinc-700 dark:bg-zinc-500/15 dark:text-zinc-300" },
+  VOICE_CALL: { label: "Llamada", kind: "call" },
+  VOICE: { label: "Llamada", kind: "call" },
+  LLAMADA: { label: "Llamada", kind: "call" },
+  VOZ: { label: "Llamada", kind: "call" },
+  WHATSAPP: { label: "WhatsApp", kind: "whatsapp" },
+  WEBSITE: { label: "Web", kind: "web" },
+  WEB_FORM: { label: "Formulario web", kind: "web" },
+  META_LEAD_ADS: { label: "Meta Ads", kind: "ads" },
+  EMAIL: { label: "Email", kind: "email" },
+  WITEI: { label: "Importado (Witei)", kind: "import" },
+  CRM: { label: "Importado (CRM)", kind: "import" },
 };
 
-const FALLBACK_CHANNEL: ChannelInfo = {
-  label: "Origen desconocido",
-  colorClass: "bg-zinc-200 text-zinc-600 dark:bg-zinc-500/15 dark:text-zinc-400",
-};
+const FALLBACK_CHANNEL: ChannelInfo = { label: "Origen desconocido", kind: "unknown" };
 
 export function normalizeChannel(raw: string | null | undefined): ChannelInfo {
   if (!raw) return FALLBACK_CHANNEL;
