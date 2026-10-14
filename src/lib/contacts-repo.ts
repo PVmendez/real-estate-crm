@@ -1,3 +1,4 @@
+import { cache } from "react";
 import contactsFile from "@/data/contactos.json";
 import type { Contact } from "./types";
 import { simulateLatency } from "./server-utils";
@@ -12,7 +13,8 @@ export async function getContacts(): Promise<Contact[]> {
   return contacts;
 }
 
-export async function getContact(id: string): Promise<Contact | null> {
+// cache(): la ficha y su <title> piden el mismo contacto en un mismo render; se resuelve una sola vez.
+export const getContact = cache(async (id: string): Promise<Contact | null> => {
   await simulateLatency();
   return contacts.find((c) => c.id === id) ?? null;
-}
+});
