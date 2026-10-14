@@ -1,66 +1,48 @@
-import Link from "next/link";
+import { ContactsBrowser } from "@/components/contacts/ContactsBrowser";
 import { getContacts } from "@/lib/contacts-repo";
-import { normalizeChannel, resolveDisplayName, formatDateTime } from "@/lib/normalize";
-import { lastInteractionAt, computeConsent } from "@/lib/derive";
-import { Avatar } from "@/components/ui/Avatar";
-import { Badge } from "@/components/ui/Badge";
-import { ChannelBadge } from "@/components/ui/ChannelBadge";
+import { isSortKey, isStatusFilter, toListItem } from "@/lib/contact-list";
 
-export default async function ContactsListPage() {
+export default async function ContactsListPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  const params = await searchParams;
   const contacts = await getContacts();
+  const items = contacts.map(toListItem);
 
-  const sorted = [...contacts].sort((a, b) => {
-    const da = lastInteractionAt(a)?.getTime() ?? 0;
-    const db = lastInteractionAt(b)?.getTime() ?? 0;
-    return db - da;
-  });
+  const fixed = items.reduce((n, i) => n + i.fixedCount, 0);
+  const issues = items.reduce((n, i) => n + i.issueCount, 0);
+  const q = typeof params.q === "string" ? params.q : "";
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
-      <header className="mb-6">
-        <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">Contactos</h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          {contacts.length} contactos · ordenados por última interacción
+    <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+      <header className="mb-8 max-w-2xl">
+        <p className="font-mono text-xs font-medium tracking-[0.14em] text-accent-ink uppercase">Contactos</p>
+        <h1 className="mt-2 font-serif text-3xl leading-tight font-medium tracking-tight text-balance text-ink sm:text-4xl">
+          {items.length} contactos de seis canales distintos, en una sola forma
+        </h1>
+        <p className="mt-3 text-base text-pretty text-ink-muted">
+          Llamadas con IA, WhatsApp, formularios, campañas e importaciones llegan con teléfonos, fechas y nombres en
+          formatos incompatibles. Cada ficha muestra el dato limpio y, al lado, cómo venía.
         </p>
+        <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
+          <Stat label="Campos corregidos" value={fixed} />
+          <Stat label="Datos inválidos detectados" value={issues} />
+        </dl>
       </header>
 
-      <ul className="divide-y divide-zinc-200 overflow-hidden rounded-xl border border-zinc-200 bg-white dark:divide-zinc-800 dark:border-zinc-800 dark:bg-zinc-900">
-        {sorted.map((contact) => {
-          const identity = resolveDisplayName(contact);
-          const channel = normalizeChannel(contact.lead_source);
-          const last = lastInteractionAt(contact);
-          const consent = computeConsent(contact);
+      <ContactsBrowser
+        items={items}
+        initialQuery={q}
+        initialStatus={isStatusFilter(params.estado) ? params.estado : "todos"}
+        initialSort={isSortKey(params.orden) ? params.orden : "reciente"}
+      />
+    </div>
+  );
+}
 
-          return (
-            <li key={contact.id}>
-              <Link
-                href={`/contacts/${contact.id}`}
-                className="flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/60"
-              >
-                <Avatar initials={identity.initials} isFallback={identity.isFallback} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">{identity.name}</p>
-                    {contact.is_test && (
-                      <Badge>test</Badge>
-                    )}
-                    {consent.blocked && (
-                      <Badge tone="danger">no contactar</Badge>
-                    )}
-                    {contact.ai_handoff && (
-                      <Badge tone="warn">necesita humano</Badge>
-                    )}
-                  </div>
-                  <p className="mt-0.5 truncate text-sm text-zinc-500 dark:text-zinc-400">
-                    {last ? `Última interacción: ${formatDateTime(last.toISOString())}` : "Sin interacciones registradas"}
-                  </p>
-                </div>
-                <ChannelBadge {...channel} />
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+function Stat({ label, value }: { label: string; value: number }) {
+  return (
+    <div>
+      <dt className="text-xs text-ink-subtle">{label}</dt>
+      <dd className="font-serif text-2xl font-medium tabular-nums text-ink">{value}</dd>
     </div>
   );
 }
