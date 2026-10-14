@@ -4,7 +4,7 @@ import { StateMessage } from "@/components/ui/StateMessage";
 
 export default function ContactNotFound() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6">
+    <div className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
       <div className="rounded-lg border border-line bg-surface">
         <StateMessage
           icon={<UserX className="size-5" />}

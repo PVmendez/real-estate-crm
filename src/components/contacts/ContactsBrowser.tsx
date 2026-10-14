@@ -147,7 +147,7 @@ export function ContactsBrowser({ items, initialQuery, initialStatus, initialSor
         </fieldset>
       </div>
 
-      <div className="mt-6 mb-3 flex items-center justify-between gap-4">
+      <div className="mt-5 mb-2.5 flex items-center justify-between gap-4">
         <p role="status" aria-live="polite" className="text-sm text-ink-muted">
           {results.length === items.length
             ? `${items.length} contactos`
@@ -181,13 +181,25 @@ export function ContactsBrowser({ items, initialQuery, initialStatus, initialSor
           </StateMessage>
         </div>
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface">
-          {results.map((item) => (
-            <li key={item.id}>
-              <ContactRow item={item} />
-            </li>
-          ))}
-        </ul>
+        <div className="overflow-hidden rounded-lg border border-line bg-surface">
+          <div
+            aria-hidden="true"
+            className="hidden grid-cols-[auto_minmax(0,1fr)_8.5rem_9rem_auto] gap-x-5 border-b border-line bg-sunken/60 px-5 py-2 text-xs font-medium text-ink-muted sm:grid"
+          >
+            <span className="w-10" />
+            <span>Contacto</span>
+            <span>Estado</span>
+            <span>Última interacción</span>
+            <span className="w-4" />
+          </div>
+          <ul className="divide-y divide-line">
+            {results.map((item) => (
+              <li key={item.id}>
+                <ContactRow item={item} />
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
@@ -210,7 +222,7 @@ function ContactRow({ item }: { item: ContactListItem }) {
           <p className={`truncate font-medium tabular-nums ${item.isFallbackName ? "text-ink-muted" : "text-ink"}`}>
             {item.name}
           </p>
-          {item.needsHuman && <Badge tone="warn">Pide un humano</Badge>}
+          {item.needsHuman && <Badge tone="warn">Pide un agente</Badge>}
           {item.doNotContact && <Badge tone="danger">No contactar</Badge>}
           {item.isTest && <Badge>Prueba</Badge>}
         </div>
@@ -237,7 +249,7 @@ function LastInteraction({ at }: { at: number | null }) {
   if (at === null) return <span className="text-ink-subtle">Sin interacciones</span>;
   return (
     <>
-      <span className="block text-xs text-ink-subtle">Última interacción</span>
+      <span className="block text-xs text-ink-subtle sm:hidden">Última interacción</span>
       <time dateTime={new Date(at).toISOString()}>{dateFormat.format(at)}</time>
     </>
   );

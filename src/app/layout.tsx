@@ -1,15 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Newsreader, Public_Sans } from "next/font/google";
-import Link from "next/link";
+import { JetBrains_Mono, Public_Sans } from "next/font/google";
+import { AppHeader } from "@/components/ui/AppHeader";
 import "./globals.css";
 
 const publicSans = Public_Sans({ variable: "--font-public-sans", subsets: ["latin"] });
-const newsreader = Newsreader({ variable: "--font-newsreader", subsets: ["latin"], weight: ["400", "500", "600"] });
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subsets: ["latin"], weight: ["400", "500"] });
 
 export const metadata: Metadata = {
   title: { default: "Miralvento CRM", template: "%s · Miralvento CRM" },
-  description: "Un CRM que convierte datos sucios en fichas claras.",
+  description: "Gestión de contactos y demandas de Miralvento Gestión Inmobiliaria.",
 };
 
 export const viewport: Viewport = {
@@ -21,7 +20,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className={`${publicSans.variable} ${newsreader.variable} ${jetbrainsMono.variable} h-full antialiased`}>
+    <html lang="es" className={`${publicSans.variable} ${jetbrainsMono.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col">
         <a
           href="#contenido"
@@ -30,31 +29,11 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           Saltar al contenido
         </a>
 
-        <header className="border-b border-line bg-paper">
-          <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
-            <Link href="/" className="flex items-baseline gap-2 rounded-sm">
-              <span className="font-serif text-xl font-medium tracking-tight text-ink">Miralvento</span>
-              <span className="font-mono text-[11px] font-medium tracking-[0.18em] text-ink-subtle uppercase">CRM</span>
-            </Link>
-            <p className="hidden text-sm text-ink-muted sm:block">Datos sucios, fichas claras.</p>
-          </div>
-        </header>
+        <AppHeader />
 
         <main id="contenido" tabIndex={-1} className="flex-1 focus:outline-none">
           {children}
         </main>
-
-        <footer className="border-t border-line">
-          <div className="mx-auto flex w-full max-w-5xl flex-col gap-1 px-4 py-6 text-xs text-ink-subtle sm:flex-row sm:justify-between sm:px-6">
-            <p>Dataset ficticio de una inmobiliaria madrileña. Ningún contacto es real.</p>
-            <a
-              href="https://github.com/PVmendez/real-estate-crm"
-              className="underline decoration-line-strong underline-offset-4 hover:text-ink"
-            >
-              Código fuente en GitHub
-            </a>
-          </div>
-        </footer>
       </body>
     </html>
   );

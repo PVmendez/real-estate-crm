@@ -87,7 +87,6 @@
   --color-info-soft: var(--info-soft);
 
   --font-sans: var(--font-public-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-newsreader), ui-serif, Georgia, serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
 }
 

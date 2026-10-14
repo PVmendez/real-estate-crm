@@ -6,6 +6,7 @@ import type { ConsentStatus } from "@/lib/derive";
 import { formatDate, normalizeChannel, normalizeEmail, normalizePhone, resolveDisplayName } from "@/lib/normalize";
 import { qualificationStatus } from "@/lib/qualification";
 import type { Contact } from "@/lib/types";
+import { agentName } from "@/lib/agents";
 import { ContactActions } from "./ContactActions";
 
 export function IdentityHeader({ contact, consent }: { contact: Contact; consent: ConsentStatus }) {
@@ -18,11 +19,11 @@ export function IdentityHeader({ contact, consent }: { contact: Contact; consent
       <div className="flex items-start gap-4">
         <Avatar initials={identity.initials} isFallback={identity.isFallback} size="lg" />
         <div className="min-w-0 flex-1">
-          <h1 className="font-serif text-2xl leading-tight font-medium tracking-tight break-words text-ink tabular-nums sm:text-3xl">
+          <h1 className="text-2xl leading-tight font-semibold tracking-tight break-words text-ink tabular-nums sm:text-3xl">
             {identity.name}
           </h1>
           {identity.isFallback && (
-            <p className="mt-1 text-sm text-ink-muted">Sin nombre registrado: se identifica por el mejor dato disponible.</p>
+            <p className="mt-1 text-sm text-ink-muted">Sin nombre registrado</p>
           )}
           <div className="mt-2.5 flex flex-wrap items-center gap-2">
             <StatusBadge status={qualificationStatus(contact.qualification_data)} />
@@ -49,7 +50,7 @@ export function IdentityHeader({ contact, consent }: { contact: Contact; consent
           )}
         </Field>
         <Field label="Alta">{formatDate(contact.created_at)}</Field>
-        <Field label="Agente asignado">{contact.assigned_agent_id ?? <Empty>Sin asignar</Empty>}</Field>
+        <Field label="Agente asignado">{agentName(contact.assigned_agent_id) ?? <Empty>Sin asignar</Empty>}</Field>
       </dl>
 
       <div className="mt-5 border-t border-line pt-5">

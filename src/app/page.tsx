@@ -5,26 +5,21 @@ import { isSortKey, isStatusFilter, toListItem } from "@/lib/contact-list";
 export default async function ContactsListPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const params = await searchParams;
   const contacts = await getContacts();
-  const items = contacts.map(toListItem);
+  // Los contactos marcados como prueba no se listan: solo existen para verificar integraciones.
+  const items = contacts.filter((c) => !c.is_test).map(toListItem);
+  const unassigned = contacts.filter((c) => !c.is_test && !c.assigned_agent_id).length;
 
-  const fixed = items.reduce((n, i) => n + i.fixedCount, 0);
-  const issues = items.reduce((n, i) => n + i.issueCount, 0);
   const q = typeof params.q === "string" ? params.q : "";
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
-      <header className="mb-8 max-w-2xl">
-        <p className="font-mono text-xs font-medium tracking-[0.14em] text-accent-ink uppercase">Contactos</p>
-        <h1 className="mt-2 font-serif text-3xl leading-tight font-medium tracking-tight text-balance text-ink sm:text-4xl">
-          {items.length} contactos de seis canales distintos, en una sola forma
-        </h1>
-        <p className="mt-3 text-base text-pretty text-ink-muted">
-          Llamadas con IA, WhatsApp, formularios, campañas e importaciones llegan con teléfonos, fechas y nombres en
-          formatos incompatibles. Cada ficha muestra el dato limpio y, al lado, cómo venía.
-        </p>
-        <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-3">
-          <Stat label="Campos corregidos" value={fixed} />
-          <Stat label="Datos inválidos detectados" value={issues} />
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <header className="mb-6">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">Contactos</h1>
+        <dl className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Stat label="Total" value={items.length} />
+          <Stat label="Cualificados" value={items.filter((i) => i.status === "cualificado").length} />
+          <Stat label="Piden hablar con una persona" value={items.filter((i) => i.needsHuman).length} tone="warn" />
+          <Stat label="Sin agente asignado" value={unassigned} />
         </dl>
       </header>
 
@@ -38,11 +33,11 @@ export default async function ContactsListPage({ searchParams }: { searchParams:
   );
 }
 
-function Stat({ label, value }: { label: string; value: number }) {
+function Stat({ label, value, tone }: { label: string; value: number; tone?: "warn" }) {
   return (
-    <div>
-      <dt className="text-xs text-ink-subtle">{label}</dt>
-      <dd className="font-serif text-2xl font-medium tabular-nums text-ink">{value}</dd>
+    <div className="rounded-lg border border-line bg-surface px-4 py-3">
+      <dt className="text-xs text-ink-muted">{label}</dt>
+      <dd className={`mt-1 text-2xl font-semibold tabular-nums ${tone === "warn" && value > 0 ? "text-warn" : "text-ink"}`}>{value}</dd>
     </div>
   );
 }

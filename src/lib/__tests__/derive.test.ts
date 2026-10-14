@@ -38,7 +38,7 @@ describe("computeHealth", () => {
   });
 
   it("cuenta la cualificación que llega como string JSON (c-003)", () => {
-    const item = computeHealth(contactById("c-003")).items.find((i) => i.label.includes("cualificación"));
+    const item = computeHealth(contactById("c-003")).items.find((i) => i.label === "Cualificación");
     expect(item?.ok).toBe(true);
   });
 

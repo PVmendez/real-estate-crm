@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function Loading() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10" role="status" aria-live="polite">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10" role="status" aria-live="polite">
       <span className="sr-only">Cargando ficha del contacto…</span>
       <Skeleton className="h-4 w-24" />
       <div className="mt-7 rounded-lg border border-line bg-surface p-4 sm:p-6">

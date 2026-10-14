@@ -26,7 +26,7 @@ export function StateMessage({
       >
         {icon}
       </div>
-      <p className="font-serif text-xl font-medium text-ink">{title}</p>
+      <p className="text-lg font-semibold text-ink">{title}</p>
       {children && <div className="mt-1.5 max-w-sm text-sm text-ink-muted">{children}</div>}
       {action && <div className="mt-5">{action}</div>}
     </div>

@@ -31,7 +31,7 @@ export function Timeline({ interactions }: { interactions: Interaction[] }) {
     >
       {sorted.length === 0 ? (
         <StateMessage icon={<MessagesSquare className="size-5" />} title="Sin interacciones">
-          Este contacto entró al CRM pero nadie ha hablado con él todavía.
+          Todavía no hay llamadas ni mensajes con este contacto.
         </StateMessage>
       ) : (
         <ol className="relative space-y-6 before:absolute before:top-2 before:bottom-2 before:left-[7px] before:w-px before:bg-line">

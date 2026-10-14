@@ -1,20 +1,16 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { Badge, type Tone } from "@/components/ui/Badge";
-import { Section } from "@/components/ui/Section";
 import type { FieldStatus, NormalizationReport, NormalizationRow } from "@/lib/report";
 
 const STATUS: Record<FieldStatus, { label: string; tone: Tone }> = {
   clean: { label: "Sin cambios", tone: "neutral" },
-  normalized: { label: "Normalizado", tone: "accent" },
+  normalized: { label: "Corregido", tone: "accent" },
   inferred: { label: "Inferido", tone: "info" },
   invalid: { label: "Inválido", tone: "danger" },
   missing: { label: "Falta", tone: "warn" },
 };
 
-/**
- * La pieza que explica el proyecto: cada campo tal como llegó del export, al lado de cómo lo muestra
- * la ficha y de la regla que lo transformó.
- */
+/** Registro de origen: cada campo tal como lo envió el canal, cómo quedó guardado y qué regla se aplicó. */
 export function RawVsNormalized({ report }: { report: NormalizationReport }) {
   const summary = [
     report.fixedCount > 0 && `${report.fixedCount} ${report.fixedCount === 1 ? "campo corregido" : "campos corregidos"}`,
@@ -24,27 +20,32 @@ export function RawVsNormalized({ report }: { report: NormalizationReport }) {
     .join(" · ");
 
   return (
-    <Section
-      id="antes-despues"
-      title="Antes y después"
-      description="Cada dato tal como llegó del export, y cómo lo muestra esta ficha."
-      aside={summary ? <p className="font-mono text-xs text-ink-muted">{summary}</p> : undefined}
-    >
+    <details id="datos-origen" className="group/origen rounded-lg border border-line bg-surface">
+      <summary className="flex cursor-pointer list-none flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-lg px-4 py-3.5 sm:px-5 [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center gap-2">
+          <ChevronRight aria-hidden="true" className="size-4 text-ink-subtle transition-transform duration-150 group-open/origen:rotate-90" />
+          <span className="text-base font-semibold text-ink">Datos de origen</span>
+        </span>
+        {summary && <span className="text-xs text-ink-muted">{summary}</span>}
+      </summary>
+      <div className="border-t border-line px-4 py-4 sm:px-5">
+      <p className="mb-3 text-sm text-ink-muted">Valores recibidos de cada canal y cómo se han guardado en la ficha.</p>
       <div
         aria-hidden="true"
         className="hidden grid-cols-[9rem_minmax(0,1fr)_1.5rem_minmax(0,1fr)] gap-x-4 border-b border-line pb-2 font-mono text-[11px] tracking-[0.12em] text-ink-subtle uppercase md:grid"
       >
         <span>Campo</span>
-        <span>Crudo</span>
+        <span>Recibido</span>
         <span />
-        <span>Normalizado</span>
+        <span>Guardado</span>
       </div>
       <ol className="divide-y divide-line">
         {report.rows.map((row) => (
           <Row key={row.field} row={row} />
         ))}
       </ol>
-    </Section>
+      </div>
+    </details>
   );
 }
 
@@ -62,14 +63,14 @@ function Row({ row }: { row: NormalizationRow }) {
       </div>
 
       <div className="min-w-0">
-        <p className="mb-1 text-xs text-ink-subtle md:sr-only">Crudo</p>
+        <p className="mb-1 text-xs text-ink-subtle md:sr-only">Recibido</p>
         {longRaw ? <LongRaw row={row} /> : <RawValue row={row} />}
       </div>
 
       <ArrowRight aria-hidden="true" className="mt-2 hidden size-4 text-ink-subtle md:block" />
 
       <div className="min-w-0">
-        <p className="mb-1 text-xs text-ink-subtle md:sr-only">Normalizado</p>
+        <p className="mb-1 text-xs text-ink-subtle md:sr-only">Guardado</p>
         {row.normalized ? (
           <p className="pt-1.5 text-sm font-medium break-words text-ink tabular-nums">{row.normalized}</p>
         ) : (
@@ -116,7 +117,7 @@ function LongRaw({ row }: { row: NormalizationRow }) {
         <span className="hidden group-open:inline">Ocultar {kind}</span>
         <span className="font-mono text-xs font-normal text-ink-subtle">({size})</span>
       </summary>
-      <pre className={`${WELL} mt-1.5 max-h-72 overflow-auto text-xs whitespace-pre-wrap break-all`} tabIndex={0} aria-label={`${row.label}: dato crudo`}>
+      <pre className={`${WELL} mt-1.5 max-h-72 overflow-auto text-xs whitespace-pre-wrap break-all`} tabIndex={0} aria-label={`${row.label}: dato recibido`}>
         {row.raw}
       </pre>
     </details>

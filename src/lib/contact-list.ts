@@ -60,7 +60,7 @@ export const SORT_LABELS: Record<SortKey, string> = {
   reciente: "Última interacción",
   nombre: "Nombre (A–Z)",
   alta: "Fecha de alta",
-  calidad: "Calidad del dato",
+  calidad: "Completitud de la ficha",
 };
 
 export function isSortKey(value: unknown): value is SortKey {

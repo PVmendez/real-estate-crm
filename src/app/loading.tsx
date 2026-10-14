@@ -2,12 +2,15 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function Loading() {
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6 sm:py-12" role="status" aria-live="polite">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8" role="status" aria-live="polite">
       <span className="sr-only">Cargando contactos…</span>
-      <div className="mb-8 max-w-2xl space-y-3">
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-9 w-full max-w-lg" />
-        <Skeleton className="h-4 w-full max-w-md" />
+      <div className="mb-6">
+        <Skeleton className="h-8 w-40" />
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-[74px] rounded-lg" />
+          ))}
+        </div>
       </div>
       <Skeleton className="h-36 w-full rounded-lg" />
       <div className="mt-6 divide-y divide-line overflow-hidden rounded-lg border border-line bg-surface">

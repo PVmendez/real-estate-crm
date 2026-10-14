@@ -8,14 +8,14 @@ export function DataQuality({ health }: { health: HealthReport }) {
   const verdict = { ok: "Ficha completa", warn: "Ficha incompleta", danger: "Ficha muy incompleta" }[level];
 
   return (
-    <Section id="calidad" title="Calidad del dato" description={verdict}>
+    <Section id="calidad" title="Completitud de la ficha" description={verdict}>
       <div className="flex items-baseline gap-1">
-        <span className="font-serif text-4xl font-medium tabular-nums text-ink">{health.score}</span>
+        <span className="text-4xl font-semibold tabular-nums text-ink">{health.score}</span>
         <span className="text-sm text-ink-muted">/ 100</span>
       </div>
       <div
         role="meter"
-        aria-label="Calidad del dato"
+        aria-label="Completitud de la ficha"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={health.score}

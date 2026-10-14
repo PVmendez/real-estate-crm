@@ -19,10 +19,10 @@ export function QualificationSection({ contact }: { contact: Contact }) {
   const { groups, parseError } = parseQualificationData(contact.qualification_data);
 
   return (
-    <Section id="cualificacion" title="Cualificación" description="Qué busca, con qué presupuesto y de dónde sale cada dato.">
+    <Section id="cualificacion" title="Cualificación" description="Qué busca y con qué presupuesto.">
       {parseError ? (
         <StateMessage role="alert" tone="danger" icon={<FileWarning className="size-5" />} title="Formato inválido">
-          Los datos de cualificación llegaron como texto que no es JSON válido y no se pudieron interpretar.
+          Los datos de cualificación recibidos están dañados y no se pudieron leer. Revísalos con el contacto.
         </StateMessage>
       ) : groups.length === 0 ? (
         <StateMessage icon={<ClipboardList className="size-5" />} title="Sin datos de cualificación">

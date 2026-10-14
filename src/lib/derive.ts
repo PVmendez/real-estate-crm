@@ -24,11 +24,11 @@ export function computeHealth(contact: Contact): HealthReport {
   const { groups } = parseQualificationData(contact.qualification_data);
 
   const items: HealthCheckItem[] = [
-    { label: "Nombre real (no derivado de teléfono/email)", points: 15, ok: !isFallback },
-    { label: "Teléfono normalizable", points: 15, ok: normalizePhone(contact.phone) !== null },
+    { label: "Nombre", points: 15, ok: !isFallback },
+    { label: "Teléfono válido", points: 15, ok: normalizePhone(contact.phone) !== null },
     { label: "Email válido", points: 10, ok: normalizeEmail(contact.email)?.valid === true },
-    { label: "Al menos un dato de cualificación", points: 30, ok: groups.length > 0 },
-    { label: "Al menos una interacción registrada", points: 20, ok: contact.interactions.length > 0 },
+    { label: "Cualificación", points: 30, ok: groups.length > 0 },
+    { label: "Interacciones", points: 20, ok: contact.interactions.length > 0 },
     { label: "Agente asignado", points: 10, ok: !!contact.assigned_agent_id },
   ];
 

@@ -29,19 +29,19 @@ export default async function ContactDetailPage({ params }: Props) {
   const consent = computeConsent(contact);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-10">
       <BackLink />
 
       <div className="mt-4 space-y-4">
         <IdentityHeader contact={contact} consent={consent} />
         <ContactAlerts contact={contact} consent={consent} duplicates={findDuplicates(allContacts, contact)} />
-        <RawVsNormalized report={buildNormalizationReport(contact)} />
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_19rem]">
         <div className="min-w-0 space-y-4">
           <QualificationSection contact={contact} />
           <Timeline interactions={contact.interactions} />
+          <RawVsNormalized report={buildNormalizationReport(contact)} />
         </div>
         <aside className="space-y-4" aria-label="Resumen de la ficha">
           <DataQuality health={computeHealth(contact)} />
