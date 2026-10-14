@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
-import contactsFile from "@/data/contactos.json";
-import type { Contact } from "@/lib/types";
-import { simulateLatency } from "@/lib/server-utils";
+import { getContacts } from "@/lib/contacts-repo";
 
 export async function GET() {
-  await simulateLatency();
-  const contacts = contactsFile.contacts as unknown as Contact[];
-  return NextResponse.json(contacts);
+  return NextResponse.json(await getContacts());
 }

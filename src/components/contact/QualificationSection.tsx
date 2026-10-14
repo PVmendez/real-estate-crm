@@ -39,7 +39,7 @@ export function QualificationSection({ contact }: { contact: Contact }) {
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400">{group.label}</p>
             <dl className="space-y-2.5">
               {group.facts.map(({ key, label, fact }) => {
-                const provenance = provenanceInfo(fact.source);
+                const provenance = provenanceInfo(fact.source, fact.sourceRef);
                 return (
                   <div key={key} className="flex items-start justify-between gap-3 text-sm">
                     <dt className="text-zinc-500 dark:text-zinc-400">{label}</dt>

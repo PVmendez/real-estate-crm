@@ -123,7 +123,10 @@ function formatCurrency(n: number): string {
 
 export type ProvenanceKind = "ai" | "human" | "import" | "unknown";
 
-export function provenanceInfo(source?: string): { label: string; kind: ProvenanceKind } {
+export function provenanceInfo(source?: string, sourceRef?: string): { label: string; kind: ProvenanceKind } {
+  // La referencia manda sobre la fuente: un dato importado del CRM anterior llega con source "explicit"
+  // pero sourceRef "import-witei", y no lo dijo el cliente en una conversación con nosotros.
+  if (sourceRef?.toLowerCase().startsWith("import")) return { label: "Importado del CRM anterior", kind: "import" };
   if (!source) return { label: "Origen sin especificar", kind: "unknown" };
   const s = source.toLowerCase();
   if (s === "manual") return { label: "Editado por un humano", kind: "human" };
@@ -131,4 +134,29 @@ export function provenanceInfo(source?: string): { label: string; kind: Provenan
   if (s.startsWith("import")) return { label: "Importado del CRM anterior", kind: "import" };
   if (s === "explicit") return { label: "Dicho por el cliente", kind: "ai" };
   return { label: source, kind: "unknown" };
+}
+
+export type QualificationStatus = "cualificado" | "parcial" | "sin-datos" | "invalido";
+
+export const QUALIFICATION_STATUS_LABELS: Record<QualificationStatus, string> = {
+  cualificado: "Cualificado",
+  parcial: "Parcial",
+  "sin-datos": "Sin datos",
+  invalido: "Dato inválido",
+};
+
+function hasValue(group: QualificationGroupView, key: string): boolean {
+  const value = group.facts.find((f) => f.key === key)?.fact.value;
+  return value !== null && value !== undefined && value !== "" && !(Array.isArray(value) && value.length === 0);
+}
+
+/**
+ * Cualificado: alguna operación (compra o alquiler) tiene zona y presupuesto, lo mínimo para buscar inmuebles.
+ * Parcial: hay algún dato pero no ese par. Inválido: el bloque llegó y no se pudo interpretar.
+ */
+export function qualificationStatus(raw: Contact["qualification_data"]): QualificationStatus {
+  const { groups, parseError } = parseQualificationData(raw);
+  if (parseError) return "invalido";
+  if (groups.length === 0) return "sin-datos";
+  return groups.some((g) => hasValue(g, "zones") && hasValue(g, "budget")) ? "cualificado" : "parcial";
 }

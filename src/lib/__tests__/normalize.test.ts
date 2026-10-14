@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  detectDateFormat,
   formatDate,
   formatDateTime,
   normalizeChannel,
+  normalizeEmail,
   normalizePhone,
   parseFlexibleDate,
+  phoneRulesApplied,
   resolveDisplayName,
   toTitleCase,
 } from "@/lib/normalize";
@@ -54,14 +57,27 @@ describe("parseFlexibleDate", () => {
     expect(parseFlexibleDate("2026-07-08T10:28:00Z")?.toISOString()).toBe("2026-07-08T10:28:00.000Z");
   });
 
-  it("interpreta dd/mm/yyyy como día/mes, no mes/día (c-005)", () => {
-    const d = parseFlexibleDate("11/07/2026");
-    expect([d?.getFullYear(), d?.getMonth(), d?.getDate()]).toEqual([2026, 6, 11]);
+  it("interpreta dd/mm/yyyy como día/mes en hora de Madrid (c-005)", () => {
+    // Medianoche del 11 de julio en Madrid (CEST, UTC+2) = 22:00 UTC del día anterior.
+    expect(parseFlexibleDate("11/07/2026")?.toISOString()).toBe("2026-07-10T22:00:00.000Z");
   });
 
-  it("interpreta dd/mm/yyyy HH:mm con hora (c-015)", () => {
-    const d = parseFlexibleDate("10/07/2026 18:42");
-    expect([d?.getDate(), d?.getMonth(), d?.getHours(), d?.getMinutes()]).toEqual([10, 6, 18, 42]);
+  it("interpreta dd/mm/yyyy HH:mm como hora de pared de Madrid (c-015)", () => {
+    expect(parseFlexibleDate("10/07/2026 18:42")?.toISOString()).toBe("2026-07-10T16:42:00.000Z");
+  });
+
+  it("aplica el horario de invierno (CET, UTC+1)", () => {
+    expect(parseFlexibleDate("15/01/2026 09:00")?.toISOString()).toBe("2026-01-15T08:00:00.000Z");
+  });
+
+  it("no depende de la zona horaria del proceso", () => {
+    const original = process.env.TZ;
+    process.env.TZ = "America/Montevideo";
+    try {
+      expect(parseFlexibleDate("10/07/2026 18:42")?.toISOString()).toBe("2026-07-10T16:42:00.000Z");
+    } finally {
+      process.env.TZ = original;
+    }
   });
 
   it("interpreta epoch en segundos (c-012) y en milisegundos", () => {
@@ -78,8 +94,9 @@ describe("parseFlexibleDate", () => {
 });
 
 describe("formatDate / formatDateTime", () => {
-  it("formatean los distintos formatos crudos en es-ES", () => {
+  it("formatean los distintos formatos crudos en es-ES y hora de Madrid", () => {
     expect(formatDate("2026-07-08T10:28:00Z")).toBe("08 jul 2026");
+    expect(formatDateTime("2026-07-08T10:28:00Z")).toBe("08 jul 2026, 12:28");
     expect(formatDate("11/07/2026")).toBe("11 jul 2026");
     expect(formatDate(1782259200)).toBe("24 jun 2026");
     expect(formatDateTime("10/07/2026 18:42")).toBe("10 jul 2026, 18:42");
@@ -153,5 +170,52 @@ describe("normalizeChannel", () => {
   it("marca como desconocido un origen nulo o no mapeado (c-012)", () => {
     expect(normalizeChannel(null).label).toBe("Origen desconocido");
     expect(normalizeChannel("FAX").label).toBe("Origen desconocido");
+  });
+});
+
+describe("phoneRulesApplied", () => {
+  it.each([
+    ["+34 655 12 34 56", ["strip-separators"]],
+    ["0034612889034", ["intl-00-prefix"]],
+    ["699112233", ["assume-spain"]],
+    ["+34688456789", []],
+    ["+34-644-556-677", ["strip-separators"]],
+  ] as const)("%s → %j", (raw, rules) => {
+    expect(phoneRulesApplied(raw)).toEqual(rules);
+  });
+
+  it("no aplica reglas sin teléfono", () => {
+    expect(phoneRulesApplied(null)).toEqual([]);
+  });
+});
+
+describe("normalizeEmail", () => {
+  it("acepta emails válidos y los pasa a minúsculas", () => {
+    expect(normalizeEmail("lucia.fdz@gmail.com")).toEqual({ value: "lucia.fdz@gmail.com", valid: true });
+    expect(normalizeEmail("  Ana@Example.COM ")).toEqual({ value: "ana@example.com", valid: true });
+  });
+
+  it("detecta el doble @ del dataset (c-015)", () => {
+    expect(normalizeEmail(contactById("c-015").email)).toEqual({ value: "mdolores@@gmail.com", valid: false });
+  });
+
+  it("rechaza emails sin dominio y devuelve null si no hay", () => {
+    expect(normalizeEmail("ana@localhost")?.valid).toBe(false);
+    expect(normalizeEmail(null)).toBeNull();
+    expect(normalizeEmail("   ")).toBeNull();
+  });
+});
+
+describe("detectDateFormat", () => {
+  it.each([
+    ["2026-07-08T10:28:00Z", "iso"],
+    ["11/07/2026", "dmy"],
+    ["11/07/2026 18:42", "dmy-time"],
+    [1782259200, "epoch-s"],
+    [1782259200000, "epoch-ms"],
+    ["ayer", "unknown"],
+    [null, "unknown"],
+  ] as const)("%s → %s", (raw, format) => {
+    expect(detectDateFormat(raw)).toBe(format);
   });
 });

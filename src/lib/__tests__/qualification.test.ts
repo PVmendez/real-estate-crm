@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { formatFactValue, parseQualificationData, provenanceInfo } from "@/lib/qualification";
-import { contactById } from "./fixtures";
+import { formatFactValue, parseQualificationData, provenanceInfo, qualificationStatus } from "@/lib/qualification";
+import { allContacts, contactById } from "./fixtures";
 
 describe("parseQualificationData", () => {
   it("agrupa por operación e ignora _meta (c-001)", () => {
@@ -87,5 +87,56 @@ describe("provenanceInfo", () => {
     [undefined, "unknown"],
   ] as const)("%s → %s", (source, kind) => {
     expect(provenanceInfo(source).kind).toBe(kind);
+  });
+});
+
+describe("provenanceInfo con sourceRef", () => {
+  it("un dato importado se marca como importado aunque diga source explicit (c-013)", () => {
+    const fact = (contactById("c-013").qualification_data as { qualification: Record<string, Record<string, { source: string; sourceRef: string }>> })
+      .qualification.sale.zones;
+    expect(provenanceInfo(fact.source, fact.sourceRef).kind).toBe("import");
+  });
+
+  it("una referencia de conversación no altera la fuente", () => {
+    expect(provenanceInfo("explicit", "conv-8812").kind).toBe("ai");
+  });
+});
+
+describe("qualificationStatus", () => {
+  it("clasifica cada contacto del dataset", () => {
+    const byStatus = Object.fromEntries(allContacts.map((c) => [c.id, qualificationStatus(c.qualification_data)]));
+    expect(byStatus).toEqual({
+      "c-001": "cualificado",
+      "c-002": "cualificado",
+      "c-003": "cualificado",
+      "c-004": "sin-datos",
+      "c-005": "sin-datos",
+      "c-006": "sin-datos",
+      "c-007": "cualificado",
+      "c-008": "cualificado",
+      "c-009": "sin-datos",
+      "c-010": "cualificado",
+      "c-011": "sin-datos",
+      "c-012": "sin-datos",
+      "c-013": "parcial",
+      "c-014": "sin-datos",
+      "c-015": "cualificado",
+      "c-016": "cualificado",
+    });
+  });
+
+  it("exige zona y presupuesto en la misma operación", () => {
+    const split = {
+      qualification: { sale: { zones: { value: ["Madrid"] } }, rental: { budget: { value: 900 } } },
+    };
+    expect(qualificationStatus(split)).toBe("parcial");
+  });
+
+  it("ignora valores vacíos", () => {
+    expect(qualificationStatus({ qualification: { sale: { zones: { value: [] }, budget: { value: 1 } } } })).toBe("parcial");
+  });
+
+  it("marca inválido un string que no es JSON", () => {
+    expect(qualificationStatus("{roto")).toBe("invalido");
   });
 });

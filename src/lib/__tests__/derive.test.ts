@@ -7,8 +7,8 @@ describe("lastInteractionAt", () => {
     expect(lastInteractionAt(contactById("c-016"))?.toISOString()).toBe("2026-07-13T19:22:00.000Z");
   });
 
-  it("compara fechas en formatos distintos (c-015: dd/mm/yyyy HH:mm)", () => {
-    expect(lastInteractionAt(contactById("c-015"))?.toISOString()).toBe("2026-07-10T18:42:00.000Z");
+  it("compara fechas en formatos distintos (c-015: dd/mm/yyyy HH:mm, hora de Madrid)", () => {
+    expect(lastInteractionAt(contactById("c-015"))?.toISOString()).toBe("2026-07-10T16:42:00.000Z");
   });
 
   it("devuelve null sin interacciones o con fechas ilegibles", () => {
@@ -24,7 +24,11 @@ describe("computeHealth", () => {
   it("suma solo los checks que se cumplen", () => {
     const health = computeHealth(contactById("c-001"));
     expect(health.score).toBe(80);
-    expect(health.items.filter((i) => !i.ok).map((i) => i.label)).toEqual(["Email", "Agente asignado"]);
+    expect(health.items.filter((i) => !i.ok).map((i) => i.label)).toEqual(["Email válido", "Agente asignado"]);
+  });
+
+  it("no puntúa un email con formato inválido (c-015)", () => {
+    expect(computeHealth(contactById("c-015")).items.find((i) => i.label === "Email válido")?.ok).toBe(false);
   });
 
   it("no da por bueno un nombre derivado del teléfono (c-012)", () => {
@@ -86,6 +90,15 @@ describe("computeConsent", () => {
       allowedChannels: [],
       reason: "Este contacto ha pedido no ser contactado.",
     });
+  });
+
+  it("no ofrece email si el email es inválido (c-015)", () => {
+    expect(computeConsent(contactById("c-015")).allowedChannels).toEqual(["call", "whatsapp"]);
+  });
+
+  it("no habilita 'solo email' si el email no es válido", () => {
+    const consent = computeConsent(makeContact({ tags: ["no-llamar"], notes: "solo por email", email: "x@@y.com" }));
+    expect(consent.allowedChannels).toEqual([]);
   });
 
   it("el tag es insensible a mayúsculas", () => {

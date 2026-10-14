@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { fetchContacts } from "@/lib/api";
+import { getContacts } from "@/lib/contacts-repo";
 import { normalizeChannel, resolveDisplayName, formatDateTime } from "@/lib/normalize";
 import { lastInteractionAt, computeConsent } from "@/lib/derive";
 import { Avatar } from "@/components/Avatar";
 import { Badge } from "@/components/Badge";
 
 export default async function ContactsListPage() {
-  const contacts = await fetchContacts();
+  const contacts = await getContacts();
 
   const sorted = [...contacts].sort((a, b) => {
     const da = lastInteractionAt(a)?.getTime() ?? 0;

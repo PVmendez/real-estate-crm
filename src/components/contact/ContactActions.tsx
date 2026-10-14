@@ -1,4 +1,4 @@
-import { normalizePhone } from "@/lib/normalize";
+import { normalizeEmail, normalizePhone } from "@/lib/normalize";
 import type { ConsentStatus } from "@/lib/derive";
 import type { Contact } from "@/lib/types";
 
@@ -7,7 +7,8 @@ export function ContactActions({ contact, consent }: { contact: Contact; consent
 
   const canCall = consent.allowedChannels.includes("call") && phone;
   const canWhatsapp = consent.allowedChannels.includes("whatsapp") && phone;
-  const canEmail = consent.allowedChannels.includes("email") && contact.email;
+  const email = normalizeEmail(contact.email);
+  const canEmail = consent.allowedChannels.includes("email") && email?.valid;
 
   return (
     <div className="flex flex-wrap gap-2">
@@ -18,7 +19,7 @@ export function ContactActions({ contact, consent }: { contact: Contact; consent
         label="WhatsApp"
         external
       />
-      <ActionButton href={canEmail ? `mailto:${contact.email}` : undefined} disabled={!canEmail} label="Email" />
+      <ActionButton href={canEmail ? `mailto:${email!.value}` : undefined} disabled={!canEmail} label="Email" />
     </div>
   );
 }

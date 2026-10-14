@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { fetchContact, fetchContacts } from "@/lib/api";
+import { getContact, getContacts } from "@/lib/contacts-repo";
 import { computeConsent, computeHealth, findDuplicates } from "@/lib/derive";
 import { IdentityHeader } from "@/components/contact/IdentityHeader";
 import { HandoffBanner } from "@/components/contact/HandoffBanner";
@@ -13,10 +13,10 @@ import { Timeline } from "@/components/contact/Timeline";
 
 export default async function ContactDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const contact = await fetchContact(id);
+  const contact = await getContact(id);
   if (!contact) notFound();
 
-  const allContacts = await fetchContacts();
+  const allContacts = await getContacts();
   const consent = computeConsent(contact);
   const health = computeHealth(contact);
   const duplicates = findDuplicates(allContacts, contact);
