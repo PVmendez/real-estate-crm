@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Miralvento CRM — Contactos",
-  description: "Ficha de contactos — reto técnico Kontaktu",
+  description: "Un CRM que convierte datos sucios en fichas claras.",
 };
 
 export default function RootLayout({
